@@ -4,18 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Package } from 'lucide-react';
 
 export default function AuthView() {
-  const { signIn, signUp } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrUsername: '',
     password: '',
-    fullName: '',
-    role: 'morador' as 'morador' | 'porteiro' | 'sindico',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,11 +19,7 @@ export default function AuthView() {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        await signUp(formData.email, formData.password, formData.fullName, formData.role);
-      } else {
-        await signIn(formData.email, formData.password);
-      }
+      await signIn(formData.emailOrUsername, formData.password);
     } finally {
       setLoading(false);
     }
@@ -43,54 +35,25 @@ export default function AuthView() {
           <div>
             <CardTitle className="text-3xl font-bold">EASY</CardTitle>
             <CardDescription className="text-base mt-2">
-              {isSignUp ? 'Criar nova conta' : 'Gestão para Portarias'}
+              Gestão para Portarias
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nome Completo</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Digite seu nome"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Tipo de Usuário</Label>
-                  <Select
-                    value={formData.role}
-                    onValueChange={(value: any) => setFormData({ ...formData, role: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="morador">Morador</SelectItem>
-                      <SelectItem value="porteiro">Porteiro</SelectItem>
-                      <SelectItem value="sindico">Síndico</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
-            )}
-            
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="emailOrUsername">Email / Usuário</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                id="emailOrUsername"
+                type="text"
+                placeholder="seu@email.com ou usuario.nome"
+                value={formData.emailOrUsername}
+                onChange={(e) => setFormData({ ...formData, emailOrUsername: e.target.value })}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Moradores: use seu email. Porteiros: use seu usuário.
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -111,19 +74,8 @@ export default function AuthView() {
               className="w-full h-12 text-base font-semibold"
               disabled={loading}
             >
-              {loading ? 'Processando...' : isSignUp ? 'Criar Conta' : 'Entrar'}
+              {loading ? 'Processando...' : 'Entrar'}
             </Button>
-
-            <div className="text-center pt-2">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm"
-              >
-                {isSignUp ? 'Já tem conta? Faça login' : 'Não tem conta? Cadastre-se'}
-              </Button>
-            </div>
           </form>
         </CardContent>
       </Card>

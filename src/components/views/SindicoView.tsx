@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Building2, Users, Package, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import ManageUnitsDialog from '@/components/sindico/ManageUnitsDialog';
+import InviteResidentDialog from '@/components/sindico/InviteResidentDialog';
+import ManagePorteiroDialog from '@/components/sindico/ManagePorteiroDialog';
 
 export default function SindicoView() {
   const [stats, setStats] = useState({
@@ -13,6 +16,9 @@ export default function SindicoView() {
     pendingDeliveries: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [unitsDialogOpen, setUnitsDialogOpen] = useState(false);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [porteiroDialogOpen, setPorteiroDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -43,20 +49,21 @@ export default function SindicoView() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between text-lg">
-              <span>Unidades</span>
-              <Building2 className="h-6 w-6 text-primary" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{stats.units}</p>
-            <p className="text-sm text-muted-foreground">cadastradas</p>
-          </CardContent>
-        </Card>
+    <>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center justify-between text-lg">
+                <span>Unidades</span>
+                <Building2 className="h-6 w-6 text-primary" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{stats.units}</p>
+              <p className="text-sm text-muted-foreground">cadastradas</p>
+            </CardContent>
+          </Card>
 
         <Card>
           <CardHeader className="pb-3">
@@ -99,7 +106,10 @@ export default function SindicoView() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-primary text-white border-0">
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-primary text-white border-0"
+          onClick={() => setUnitsDialogOpen(true)}
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
@@ -116,7 +126,10 @@ export default function SindicoView() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-success text-white border-0">
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-success text-white border-0"
+          onClick={() => setInviteDialogOpen(true)}
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5" />
@@ -133,7 +146,10 @@ export default function SindicoView() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer"
+          onClick={() => setPorteiroDialogOpen(true)}
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-info" />
@@ -171,5 +187,22 @@ export default function SindicoView() {
         </CardContent>
       </Card>
     </div>
+
+    <ManageUnitsDialog 
+      open={unitsDialogOpen} 
+      onOpenChange={setUnitsDialogOpen}
+      onSuccess={fetchStats}
+    />
+
+    <InviteResidentDialog 
+      open={inviteDialogOpen} 
+      onOpenChange={setInviteDialogOpen}
+    />
+
+    <ManagePorteiroDialog 
+      open={porteiroDialogOpen} 
+      onOpenChange={setPorteiroDialogOpen}
+    />
+  </>
   );
 }

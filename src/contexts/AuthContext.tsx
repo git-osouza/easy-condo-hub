@@ -78,7 +78,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (emailOrUsername: string, password: string) => {
+    let email = emailOrUsername;
+    
+    // Se não contém @, é username de porteiro
+    if (!emailOrUsername.includes('@')) {
+      email = `${emailOrUsername}@portaria.easy`;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
