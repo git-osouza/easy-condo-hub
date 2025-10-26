@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Bell, Package, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import NotificationSettings from '@/components/morador/NotificationSettings';
 
 interface Delivery {
   id: string;
@@ -78,6 +79,8 @@ export default function MoradorView() {
 
   return (
     <div className="space-y-6">
+      <NotificationSettings />
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-warning/50 bg-warning/5">
           <CardHeader className="pb-3">

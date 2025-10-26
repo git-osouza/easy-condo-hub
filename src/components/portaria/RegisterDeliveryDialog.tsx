@@ -89,7 +89,7 @@ export default function RegisterDeliveryDialog({ open, onOpenChange, onSuccess }
         photoUrl = await uploadPhoto(photo);
       }
 
-      const { error } = await supabase
+      const { data: delivery, error } = await supabase
         .from('deliveries')
         .insert({
           unit_id: formData.unit_id,
@@ -97,11 +97,35 @@ export default function RegisterDeliveryDialog({ open, onOpenChange, onSuccess }
           photo_url: photoUrl,
           created_by_user_id: user?.id,
           status: 'aguardando',
-        });
+        })
+        .select('id, unit_id')
+        .single();
 
       if (error) throw error;
 
-      toast.success('Entrega registrada com sucesso!');
+      // Buscar info da unidade para enviar notificação
+      const { data: unit } = await supabase
+        .from('units')
+        .select('unit_label')
+        .eq('id', formData.unit_id)
+        .single();
+
+      // Enviar notificação via edge function
+      try {
+        await supabase.functions.invoke('send-delivery-notification', {
+          body: {
+            delivery_id: delivery.id,
+            unit_id: delivery.unit_id,
+            unit_label: unit?.unit_label || 'Unidade',
+            obs: formData.obs
+          }
+        });
+      } catch (notifError) {
+        console.error('Error sending notification:', notifError);
+        // Não bloquear o registro se falhar a notificação
+      }
+
+      toast.success('Entrega registrada e morador notificado!');
       setFormData({ unit_id: '', obs: '' });
       setPhoto(null);
       setPhotoPreview(null);
