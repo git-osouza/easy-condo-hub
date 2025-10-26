@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import ManageUnitsDialog from '@/components/sindico/ManageUnitsDialog';
 import InviteResidentDialog from '@/components/sindico/InviteResidentDialog';
 import ManagePorteiroDialog from '@/components/sindico/ManagePorteiroDialog';
+import ExportReportsDialog from '@/components/sindico/ExportReportsDialog';
 
 export default function SindicoView() {
   const [stats, setStats] = useState({
@@ -19,6 +20,7 @@ export default function SindicoView() {
   const [unitsDialogOpen, setUnitsDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [porteiroDialogOpen, setPorteiroDialogOpen] = useState(false);
+  const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -167,23 +169,15 @@ export default function SindicoView() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setReportsDialogOpen(true)}>
         <CardHeader>
           <CardTitle>Relatórios e Auditoria</CardTitle>
-          <CardDescription>Acesso completo ao histórico de entregas</CardDescription>
+          <CardDescription>Exportar dados e logs do sistema</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start">
-              Relatório de Entregas por Período
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              Exportar Dados (CSV)
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              Log de Auditoria
-            </Button>
-          </div>
+          <Button variant="outline" className="w-full">
+            Gerar Relatórios
+          </Button>
         </CardContent>
       </Card>
     </div>
@@ -202,6 +196,11 @@ export default function SindicoView() {
     <ManagePorteiroDialog 
       open={porteiroDialogOpen} 
       onOpenChange={setPorteiroDialogOpen}
+    />
+
+    <ExportReportsDialog 
+      open={reportsDialogOpen} 
+      onOpenChange={setReportsDialogOpen}
     />
   </>
   );

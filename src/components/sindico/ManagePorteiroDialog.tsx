@@ -33,7 +33,10 @@ export default function ManagePorteiroDialog({ open, onOpenChange }: ManagePorte
     try {
       const email = `${formData.username}@portaria.easy`;
       
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Get current session to restore later
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password: formData.password,
         options: {
@@ -46,6 +49,14 @@ export default function ManagePorteiroDialog({ open, onOpenChange }: ManagePorte
       });
 
       if (authError) throw authError;
+      
+      // Restore the current session (prevents auto-login)
+      if (currentSession) {
+        await supabase.auth.setSession({
+          access_token: currentSession.access_token,
+          refresh_token: currentSession.refresh_token,
+        });
+      }
 
       toast.success(
         `Porteiro cadastrado!\nUsuário: ${formData.username}\nSenha: ${formData.password}`
