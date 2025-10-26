@@ -15,12 +15,11 @@ try {
     },
   });
 } catch (e) {
-    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swPath = `${import.meta.env.BASE_URL}sw.js`;
-        navigator.serviceWorker.register(swPath)
-          .then(() => console.log('SW registrado (fallback)', swPath))
-          .catch(err => console.log('Falha ao registrar SW (fallback):', err));
-      });
-    }
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('SW registrado (fallback)'))
+        .catch(err => console.log('Falha ao registrar SW (fallback):', err));
+    });
+  }
 }
