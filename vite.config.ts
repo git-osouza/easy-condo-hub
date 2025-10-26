@@ -21,10 +21,10 @@ export default defineConfig(({ mode }) => ({
         background_color: '#0ea5a0',
         theme_color: '#0ea5a0',
         icons: [
-          { src: '/easy-condo-hub/app-icon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
-          { src: '/easy-condo-hub/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-          { src: '/easy-condo-hub/icon-512x512.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-          { src: '/easy-condo-hub/placeholder.svg', sizes: 'any', type: 'image/svg+xml' }
+          { src: 'app-icon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
+          { src: 'icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icon-512x512.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: 'placeholder.svg', sizes: 'any', type: 'image/svg+xml' }
         ]
       }
     }),
