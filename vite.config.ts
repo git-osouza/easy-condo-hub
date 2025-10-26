@@ -25,7 +25,26 @@ export default defineConfig(({ mode }) => ({
           { src: '/icon-512x512.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
           { src: '/placeholder.svg', sizes: 'any', type: 'image/svg+xml' }
         ]
-      }
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "supabase-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
     }),
     mode === "development" && componentTagger()
   ].filter(Boolean),
