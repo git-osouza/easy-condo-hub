@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building2, Users, Package, UserPlus } from 'lucide-react';
+import { Building2, Users, Package, UserPlus, UserX, FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import ManageUnitsDialog from '@/components/sindico/ManageUnitsDialog';
-import InviteResidentDialog from '@/components/sindico/InviteResidentDialog';
-import ManagePorteiroDialog from '@/components/sindico/ManagePorteiroDialog';
 import ExportReportsDialog from '@/components/sindico/ExportReportsDialog';
 
 export default function SindicoView() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     units: 0,
     profiles: 0,
@@ -17,9 +16,6 @@ export default function SindicoView() {
     pendingDeliveries: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [unitsDialogOpen, setUnitsDialogOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [porteiroDialogOpen, setPorteiroDialogOpen] = useState(false);
   const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -107,98 +103,138 @@ export default function SindicoView() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card 
-          className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-primary text-white border-0"
-          onClick={() => setUnitsDialogOpen(true)}
-        >
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Cadastrar Unidades
-            </CardTitle>
-            <CardDescription className="text-white/90">
-              Criar estrutura de blocos e apartamentos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="secondary" className="w-full">
-              Gerenciar Unidades
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Gestão de Cadastros</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-primary text-white border-0"
+              onClick={() => navigate('/manage-units')}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Cadastrar Unidades
+                </CardTitle>
+                <CardDescription className="text-white/90">
+                  Criar estrutura de blocos e apartamentos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="secondary" className="w-full">
+                  Gerenciar Unidades
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card 
-          className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-success text-white border-0"
-          onClick={() => setInviteDialogOpen(true)}
-        >
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
-              Convidar Moradores
-            </CardTitle>
-            <CardDescription className="text-white/90">
-              Enviar convites por email
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="secondary" className="w-full">
-              Criar Convites
-            </Button>
-          </CardContent>
-        </Card>
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-success text-white border-0"
+              onClick={() => navigate('/invite-resident')}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" />
+                  Convidar Moradores
+                </CardTitle>
+                <CardDescription className="text-white/90">
+                  Enviar convites por email
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="secondary" className="w-full">
+                  Criar Convites
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card 
-          className="hover:shadow-lg transition-shadow cursor-pointer"
-          onClick={() => setPorteiroDialogOpen(true)}
-        >
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-info" />
-              Cadastrar Porteiros
-            </CardTitle>
-            <CardDescription>
-              Gerenciar equipe da portaria
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full">
-              Gerenciar Porteiros
-            </Button>
-          </CardContent>
-        </Card>
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => navigate('/manage-porteiro')}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-info" />
+                  Cadastrar Porteiros
+                </CardTitle>
+                <CardDescription>
+                  Gerenciar equipe da portaria
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">
+                  Gerenciar Porteiros
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Gestão de Remoções</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50"
+              onClick={() => navigate('/remove-porteiro')}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserX className="h-5 w-5 text-destructive" />
+                  Remover Porteiro
+                </CardTitle>
+                <CardDescription>
+                  Desativar acesso de porteiro
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="destructive" className="w-full">
+                  Remover Porteiro
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50"
+              onClick={() => navigate('/remove-morador')}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserX className="h-5 w-5 text-destructive" />
+                  Remover Morador
+                </CardTitle>
+                <CardDescription>
+                  Desativar acesso de morador
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="destructive" className="w-full">
+                  Remover Morador
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">Relatórios</h3>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setReportsDialogOpen(true)}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Relatórios e Auditoria
+              </CardTitle>
+              <CardDescription>Exportar dados e logs do sistema</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Gerar Relatórios
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setReportsDialogOpen(true)}>
-        <CardHeader>
-          <CardTitle>Relatórios e Auditoria</CardTitle>
-          <CardDescription>Exportar dados e logs do sistema</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="outline" className="w-full">
-            Gerar Relatórios
-          </Button>
-        </CardContent>
-      </Card>
     </div>
 
-    <ManageUnitsDialog 
-      open={unitsDialogOpen} 
-      onOpenChange={setUnitsDialogOpen}
-      onSuccess={fetchStats}
-    />
-
-    <InviteResidentDialog 
-      open={inviteDialogOpen} 
-      onOpenChange={setInviteDialogOpen}
-    />
-
-    <ManagePorteiroDialog 
-      open={porteiroDialogOpen} 
-      onOpenChange={setPorteiroDialogOpen}
-    />
-
-    <ExportReportsDialog 
+    <ExportReportsDialog
       open={reportsDialogOpen} 
       onOpenChange={setReportsDialogOpen}
     />
