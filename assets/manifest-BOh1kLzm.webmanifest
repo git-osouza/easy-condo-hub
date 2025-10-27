@@ -1,7 +1,7 @@
 {
   "name": "EASY - Gestão para Portarias",
   "short_name": "EASY",
-  "start_url": "/",
+  "start_url": "/easy-condo-hub/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0ea5a0",
