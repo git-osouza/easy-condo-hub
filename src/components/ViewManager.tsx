@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthView from './views/AuthView';
 import PortariaView from './views/PortariaView';
@@ -11,7 +11,24 @@ type ViewType = 'portaria' | 'morador' | 'sindico' | 'settings';
 
 export default function ViewManager() {
   const { user, profile, loading, signOut } = useAuth();
-  const [currentView, setCurrentView] = useState<ViewType>('portaria');
+  
+  // Auto-select view based on user role
+  const getDefaultView = (): ViewType => {
+    if (!profile) return 'portaria';
+    if (profile.role === 'porteiro') return 'portaria';
+    if (profile.role === 'morador') return 'morador';
+    if (profile.role === 'sindico') return 'sindico';
+    return 'portaria';
+  };
+  
+  const [currentView, setCurrentView] = useState<ViewType>(getDefaultView());
+
+  // Update view when profile changes
+  useEffect(() => {
+    if (profile) {
+      setCurrentView(getDefaultView());
+    }
+  }, [profile?.role]);
 
   if (loading) {
     return (

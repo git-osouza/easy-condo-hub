@@ -45,6 +45,9 @@ export default function InviteResidentDialog({ open, onOpenChange }: InviteResid
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
+      // Get unit label
+      const selectedUnit = units.find(u => u.id === formData.unit_id);
+
       const { error } = await supabase.from('invite_tokens').insert({
         email: formData.email,
         token,
@@ -55,7 +58,21 @@ export default function InviteResidentDialog({ open, onOpenChange }: InviteResid
 
       if (error) throw error;
 
-      toast.success('Convite criado! Token: ' + token);
+      // Send invitation email
+      try {
+        await supabase.functions.invoke('send-invite-email', {
+          body: { 
+            email: formData.email, 
+            token, 
+            unit_label: selectedUnit?.unit_label || 'sua unidade'
+          }
+        });
+        toast.success('Convite enviado por email!');
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        toast.success('Convite criado! Token: ' + token);
+      }
+
       setFormData({ email: '', unit_id: '' });
       onOpenChange(false);
     } catch (error: any) {

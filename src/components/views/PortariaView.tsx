@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,8 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { PackagePlus, PackageCheck, Search, Package } from 'lucide-react';
 import { toast } from 'sonner';
-import RegisterDeliveryDialog from '@/components/portaria/RegisterDeliveryDialog';
-import PickupDeliveryDialog from '@/components/portaria/PickupDeliveryDialog';
 import SearchDeliveryDialog from '@/components/portaria/SearchDeliveryDialog';
 
 interface Delivery {
@@ -24,12 +23,10 @@ interface Delivery {
 
 export default function PortariaView() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
-  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
-  const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
-  const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
 
   useEffect(() => {
     fetchDeliveries();
@@ -59,12 +56,6 @@ export default function PortariaView() {
   };
 
   const pendingCount = deliveries.filter(d => d.status === 'aguardando').length;
-  const pendingDeliveries = deliveries.filter(d => d.status === 'aguardando');
-
-  const handlePickupClick = (delivery: Delivery) => {
-    setSelectedDelivery(delivery);
-    setPickupDialogOpen(true);
-  };
 
   return (
     <>
@@ -72,7 +63,7 @@ export default function PortariaView() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card 
             className="bg-gradient-primary text-white border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => setRegisterDialogOpen(true)}
+            onClick={() => navigate('/register-delivery')}
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center justify-between text-lg">
@@ -88,12 +79,10 @@ export default function PortariaView() {
           <Card 
             className="bg-gradient-success text-white border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
             onClick={() => {
-              if (pendingDeliveries.length === 0) {
+              if (pendingCount === 0) {
                 toast.info('Não há entregas pendentes');
-              } else if (pendingDeliveries.length === 1) {
-                handlePickupClick(pendingDeliveries[0]);
               } else {
-                setPickupDialogOpen(true);
+                navigate('/pickup-delivery');
               }
             }}
           >
@@ -163,7 +152,7 @@ export default function PortariaView() {
                   className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => {
                     if (delivery.status === 'aguardando') {
-                      handlePickupClick(delivery);
+                      navigate('/pickup-delivery');
                     }
                   }}
                 >
@@ -193,19 +182,6 @@ export default function PortariaView() {
         </CardContent>
       </Card>
     </div>
-
-    <RegisterDeliveryDialog 
-      open={registerDialogOpen} 
-      onOpenChange={setRegisterDialogOpen}
-      onSuccess={fetchDeliveries}
-    />
-    
-    <PickupDeliveryDialog 
-      open={pickupDialogOpen} 
-      onOpenChange={setPickupDialogOpen}
-      delivery={selectedDelivery}
-      onSuccess={fetchDeliveries}
-    />
 
     <SearchDeliveryDialog 
       open={searchDialogOpen} 

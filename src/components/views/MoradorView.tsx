@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Package, CheckCircle2 } from 'lucide-react';
+import { Bell, Package, CheckCircle2, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import NotificationSettings from '@/components/morador/NotificationSettings';
 
@@ -30,6 +30,7 @@ export default function MoradorView() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unitLabel, setUnitLabel] = useState<string>('');
 
   useEffect(() => {
     if (profile) {
@@ -41,11 +42,16 @@ export default function MoradorView() {
     try {
       const { data: unitProfiles } = await supabase
         .from('unit_profiles')
-        .select('unit_id')
+        .select('unit_id, units(unit_label)')
         .eq('profile_id', profile?.id);
 
       if (unitProfiles && unitProfiles.length > 0) {
         const unitIds = unitProfiles.map(up => up.unit_id);
+        
+        // Set the first unit label
+        if (unitProfiles[0].units) {
+          setUnitLabel(unitProfiles[0].units.unit_label);
+        }
 
         const { data: deliveriesData, error: deliveriesError } = await supabase
           .from('deliveries')
@@ -79,6 +85,18 @@ export default function MoradorView() {
 
   return (
     <div className="space-y-6">
+      <Card className="bg-gradient-primary text-white border-0">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">{profile?.full_name}</h2>
+              <p className="text-white/90">Unidade: {unitLabel || 'Carregando...'}</p>
+            </div>
+            <Home className="h-12 w-12 opacity-80" />
+          </div>
+        </CardContent>
+      </Card>
+
       <NotificationSettings />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
