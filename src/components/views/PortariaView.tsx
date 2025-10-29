@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PackagePlus, PackageCheck, Search, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import SearchDeliveryDialog from '@/components/portaria/SearchDeliveryDialog';
+import RegisterDeliveryDialog from '@/components/portaria/RegisterDeliveryDialog';
+import PickupDeliveryDialog from '@/components/portaria/PickupDeliveryDialog';
 
 interface Delivery {
   id: string;
@@ -23,10 +23,12 @@ interface Delivery {
 
 export default function PortariaView() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+  const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
+  const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
 
   useEffect(() => {
     fetchDeliveries();
@@ -63,7 +65,7 @@ export default function PortariaView() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card 
             className="bg-gradient-primary text-white border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => navigate('/register-delivery')}
+            onClick={() => setRegisterDialogOpen(true)}
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center justify-between text-lg">
@@ -82,7 +84,7 @@ export default function PortariaView() {
               if (pendingCount === 0) {
                 toast.info('Não há entregas pendentes');
               } else {
-                navigate('/pickup-delivery');
+                setPickupDialogOpen(true);
               }
             }}
           >
@@ -152,7 +154,8 @@ export default function PortariaView() {
                   className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => {
                     if (delivery.status === 'aguardando') {
-                      navigate('/pickup-delivery');
+                      setSelectedDelivery(delivery);
+                      setPickupDialogOpen(true);
                     }
                   }}
                 >
@@ -187,6 +190,36 @@ export default function PortariaView() {
       open={searchDialogOpen} 
       onOpenChange={setSearchDialogOpen}
     />
+    
+    <RegisterDeliveryDialog 
+      open={registerDialogOpen}
+      onOpenChange={(open) => {
+        setRegisterDialogOpen(open);
+        if (!open) {
+          fetchDeliveries(); // Refresh list after registration
+        }
+      }}
+      onSuccess={() => {
+        fetchDeliveries();
+      }}
+    />
+    
+    {selectedDelivery && (
+      <PickupDeliveryDialog 
+        open={pickupDialogOpen}
+        onOpenChange={(open) => {
+          setPickupDialogOpen(open);
+          if (!open) {
+            setSelectedDelivery(null);
+            fetchDeliveries(); // Refresh list after pickup
+          }
+        }}
+        delivery={selectedDelivery}
+        onSuccess={() => {
+          fetchDeliveries();
+        }}
+      />
+    )}
   </>
   );
 }
