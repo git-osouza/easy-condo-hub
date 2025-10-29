@@ -64,8 +64,7 @@ export default function InviteResidentDialog({ open, onOpenChange }: InviteResid
           body: { 
             email: formData.email, 
             token, 
-            unit_label: selectedUnit?.unit_label || 'sua unidade',
-            unit_id: formData.unit_id
+            unit_label: selectedUnit?.unit_label || 'sua unidade'
           }
         });
         toast.success('Convite enviado por email!');

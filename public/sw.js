@@ -1,12 +1,11 @@
 const CACHE_NAME = 'easy-portaria-v1';
-const BASE_PATH = '/easy-portaria';
 const urlsToCache = [
-  `${BASE_PATH}/`,
-  `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/manifest.webmanifest`,
-  `${BASE_PATH}/app-icon.svg`,
-  `${BASE_PATH}/icon-512x512.png`,
-  `${BASE_PATH}/icon-192x192.png`
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/app-icon.svg',
+  '/icon-512x512.png',
+  '/icon-192x192.png'
 ];
 
 // Install service worker and cache resources
@@ -51,7 +50,7 @@ self.addEventListener('fetch', (event) => {
       .catch(() => {
         return caches.match(event.request)
           .then((response) => {
-            return response || caches.match(`${BASE_PATH}/index.html`);
+            return response || caches.match('/index.html');
           });
       })
   );
@@ -64,8 +63,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body || 'Nova notificação',
-    icon: `${BASE_PATH}/icon-192x192.png`,
-    badge: `${BASE_PATH}/app-icon.svg`,
+    icon: '/icon-192x192.png',
+    badge: '/app-icon.svg',
     vibrate: [200, 100, 200],
     data: data.data || {},
     actions: data.actions || []
@@ -81,6 +80,6 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   event.waitUntil(
-    clients.openWindow(event.notification.data.url || `${BASE_PATH}/`)
+    clients.openWindow(event.notification.data.url || '/')
   );
 });
