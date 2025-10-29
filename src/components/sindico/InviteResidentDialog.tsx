@@ -61,7 +61,7 @@ export default function InviteResidentDialog({ open, onOpenChange }: InviteResid
       // Send invitation email
       try {
         await supabase.functions.invoke('send-invite-email', {
-         body: { 
+          body: { 
             email: formData.email, 
             token, 
             unit_label: selectedUnit?.unit_label || 'sua unidade',
