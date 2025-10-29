@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, Package, UserPlus, UserX, FileText, Settings } from 'lucide-react';
+import { Building2, Users, Package, UserPlus, UserX, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import ManageUnitsDialog from '@/components/sindico/ManageUnitsDialog';
 import InviteResidentDialog from '@/components/sindico/InviteResidentDialog';
@@ -26,10 +26,6 @@ export default function SindicoView() {
   const [porteiroDialogOpen, setPorteiroDialogOpen] = useState(false);
   const [reportsDialogOpen, setReportsDialogOpen] = useState(false);
   
-  // Management sections state
-  const [showUnitsManagement, setShowUnitsManagement] = useState(false);
-  const [showPorteiroManagement, setShowPorteiroManagement] = useState(false);
-  const [showMoradorManagement, setShowMoradorManagement] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -64,108 +60,6 @@ export default function SindicoView() {
       setLoading(false);
     }
   };
-
-  if (showUnitsManagement) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Gestão de Unidades</h2>
-          <button onClick={() => setShowUnitsManagement(false)} className="text-muted-foreground hover:text-foreground">
-            ← Voltar ao Dashboard
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setUnitsDialogOpen(true)}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-primary" />
-                Cadastrar Unidades
-              </CardTitle>
-              <CardDescription>Criar estrutura de blocos e apartamentos</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-destructive" />
-                Remover Unidades
-              </CardTitle>
-              <CardDescription>Desativar unidades do sistema</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-        <ManageUnitsDialog open={unitsDialogOpen} onOpenChange={setUnitsDialogOpen} />
-      </div>
-    );
-  }
-
-  if (showPorteiroManagement) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Gestão de Portaria</h2>
-          <button onClick={() => setShowPorteiroManagement(false)} className="text-muted-foreground hover:text-foreground">
-            ← Voltar ao Dashboard
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setPorteiroDialogOpen(true)}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserPlus className="h-5 w-5 text-info" />
-                Cadastrar Porteiros
-              </CardTitle>
-              <CardDescription>Adicionar novos porteiros à equipe</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-destructive" />
-                Remover Porteiros
-              </CardTitle>
-              <CardDescription>Desativar acesso de porteiros</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-        <ManagePorteiroDialog open={porteiroDialogOpen} onOpenChange={setPorteiroDialogOpen} />
-      </div>
-    );
-  }
-
-  if (showMoradorManagement) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Gestão de Moradores</h2>
-          <button onClick={() => setShowMoradorManagement(false)} className="text-muted-foreground hover:text-foreground">
-            ← Voltar ao Dashboard
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setInviteDialogOpen(true)}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserPlus className="h-5 w-5 text-success" />
-                Convidar Moradores
-              </CardTitle>
-              <CardDescription>Enviar convites por email</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-destructive" />
-                Remover Moradores
-              </CardTitle>
-              <CardDescription>Desativar acesso de moradores</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-        <InviteResidentDialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -226,69 +120,66 @@ export default function SindicoView() {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-3">Central de Gestão</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card 
-            className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-primary text-white border-0"
-            onClick={() => setShowUnitsManagement(true)}
-          >
+        <h3 className="text-lg font-semibold mb-3">Gestão</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setUnitsDialogOpen(true)}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Gestão de Unidades
+                <Building2 className="h-5 w-5 text-primary" />
+                Cadastrar Unidades
               </CardTitle>
-              <CardDescription className="text-white/90">
-                Cadastrar e remover unidades
-              </CardDescription>
+              <CardDescription>Criar estrutura de blocos e apartamentos</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="text-sm">Gerenciar</span>
-              </div>
-            </CardContent>
           </Card>
 
-          <Card 
-            className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-success text-white border-0"
-            onClick={() => setShowPorteiroManagement(true)}
-          >
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Gestão de Portaria
+                <UserX className="h-5 w-5 text-destructive" />
+                Remover Unidades
               </CardTitle>
-              <CardDescription className="text-white/90">
-                Cadastrar e remover porteiros
-              </CardDescription>
+              <CardDescription>Desativar unidades do sistema</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="text-sm">Gerenciar</span>
-              </div>
-            </CardContent>
           </Card>
 
-          <Card 
-            className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-info text-white border-0"
-            onClick={() => setShowMoradorManagement(true)}
-          >
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setInviteDialogOpen(true)}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <UserPlus className="h-5 w-5" />
-                Gestão de Moradores
+                <UserPlus className="h-5 w-5 text-success" />
+                Convidar Moradores
               </CardTitle>
-              <CardDescription className="text-white/90">
-                Convidar e remover moradores
-              </CardDescription>
+              <CardDescription>Enviar convites por email</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="text-sm">Gerenciar</span>
-              </div>
-            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserX className="h-5 w-5 text-destructive" />
+                Remover Moradores
+              </CardTitle>
+              <CardDescription>Desativar acesso de moradores</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setPorteiroDialogOpen(true)}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-info" />
+                Cadastrar Porteiros
+              </CardTitle>
+              <CardDescription>Adicionar novos porteiros</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-destructive/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserX className="h-5 w-5 text-destructive" />
+                Remover Porteiros
+              </CardTitle>
+              <CardDescription>Desativar acesso de porteiros</CardDescription>
+            </CardHeader>
           </Card>
         </div>
       </div>
@@ -306,6 +197,9 @@ export default function SindicoView() {
         </Card>
       </div>
 
+      <ManageUnitsDialog open={unitsDialogOpen} onOpenChange={setUnitsDialogOpen} />
+      <InviteResidentDialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} />
+      <ManagePorteiroDialog open={porteiroDialogOpen} onOpenChange={setPorteiroDialogOpen} />
       <ExportReportsDialog open={reportsDialogOpen} onOpenChange={setReportsDialogOpen} />
     </div>
   );
