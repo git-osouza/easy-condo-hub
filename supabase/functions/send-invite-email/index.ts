@@ -3,14 +3,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { corsHeaders } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 interface InviteEmailRequest {
   email: string;
   token: string;
   unit_label: string;
-  unit_id: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,7 +16,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, token, unit_label, unit_id }: InviteEmailRequest = await req.json();
+    const { email, token, unit_label }: InviteEmailRequest = await req.json();
 
     if (!RESEND_API_KEY) {
       console.error("RESEND_API_KEY não configurada");
@@ -29,22 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Buscar o convite para vincular com o unit_id quando o usuário se cadastrar
-    const { data: invite } = await supabase
-      .from('invite_tokens')
-      .select('*')
-      .eq('token', token)
-      .single();
-
-    if (invite) {
-      console.log(`Convite encontrado para ${email}, unit_id: ${unit_id}`);
-    }
-
-    const baseUrl = Deno.env.get("VITE_SUPABASE_URL") || supabaseUrl;
-    const redirectUrl = `${baseUrl.replace('/rest/v1', '')}/`;
-    const inviteUrl = `${baseUrl.replace('/rest/v1', '')}/auth/v1/verify?token=${token}&type=signup&redirect_to=${encodeURIComponent(redirectUrl)}`;
+    const inviteUrl = `${Deno.env.get("VITE_SUPABASE_URL")}/auth/v1/verify?token=${token}&type=invite&redirect_to=${encodeURIComponent(window.location.origin)}`;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -53,60 +35,22 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "EASY Portaria <onboarding@resend.dev>",
+        from: "EASY Gestão <onboarding@resend.dev>",
         to: [email],
-        subject: "Convite para criar conta no EASY",
+        subject: "Convite para acessar o EASY Gestão",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #0ea5a0 0%, #0d8f8b 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 32px;">EASY</h1>
-              <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">Gestão para Portarias</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #333;">Você foi convidado!</h1>
+            <p>Você foi convidado para acessar o sistema EASY Gestão como morador da unidade <strong>${unit_label}</strong>.</p>
+            <p>Para criar sua conta, clique no botão abaixo:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${inviteUrl}" 
+                 style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                Criar Minha Conta
+              </a>
             </div>
-            
-            <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #1f2937; margin-top: 0;">Bem-vindo ao EASY!</h2>
-              
-              <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-                Você foi convidado para criar uma conta no sistema EASY de gestão de portarias.
-              </p>
-              
-              <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #6b7280; font-size: 14px;">Sua unidade:</p>
-                <p style="margin: 5px 0 0 0; color: #1f2937; font-size: 18px; font-weight: bold;">${unit_label}</p>
-              </div>
-              
-              <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-                Para criar sua senha e acessar o sistema, clique no botão abaixo:
-              </p>
-              
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${inviteUrl}" 
-                   style="background: linear-gradient(135deg, #0ea5a0 0%, #0d8f8b 100%); 
-                          color: white; 
-                          padding: 15px 40px; 
-                          text-decoration: none; 
-                          border-radius: 8px; 
-                          font-weight: bold;
-                          font-size: 16px;
-                          display: inline-block;">
-                  Criar Minha Conta
-                </a>
-              </div>
-              
-              <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
-                Se você não solicitou este convite, pode ignorar este email com segurança.
-              </p>
-              
-              <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 20px;">
-                Ou copie e cole este link no seu navegador:<br>
-                <span style="word-break: break-all; color: #0ea5a0;">${inviteUrl}</span>
-              </p>
-            </div>
-            
-            <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-              <p style="margin: 0;">EASY - Gestão para Portarias</p>
-              <p style="margin: 5px 0 0 0;">Sistema de gestão inteligente para condomínios</p>
-            </div>
+            <p style="color: #666; font-size: 14px;">Este convite expira em 7 dias.</p>
+            <p style="color: #666; font-size: 14px;">Se você não solicitou este convite, pode ignorar este email.</p>
           </div>
         `,
       }),
