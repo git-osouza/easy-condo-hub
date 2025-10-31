@@ -43,34 +43,21 @@ export default function InviteResident() {
     setLoading(true);
 
     try {
-      const token = Math.random().toString(36).substring(2, 15);
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-
       const selectedUnit = units.find(u => u.id === formData.unit_id);
 
-      const { error } = await supabase.from('invite_tokens').insert({
-        email: formData.email,
-        token,
-        expires_at: expiresAt.toISOString(),
-        role: 'morador',
-        unit_id: formData.unit_id,
-      });
-
-      if (error) throw error;
-
+      // Request the server function to create the invite using Supabase-generated link
       try {
         await supabase.functions.invoke('send-invite-email', {
-          body: { 
-            email: formData.email, 
-            token, 
-            unit_label: selectedUnit?.unit_label || 'sua unidade'
+          body: {
+            email: formData.email,
+            unit_label: selectedUnit?.unit_label || 'sua unidade',
+            unit_id: formData.unit_id,
           }
         });
         toast.success('Convite enviado por email!');
       } catch (emailError) {
         console.error('Error sending email:', emailError);
-        toast.success('Convite criado! Token: ' + token);
+        toast.error('Erro ao enviar convite por email');
       }
 
       navigate(-1);
