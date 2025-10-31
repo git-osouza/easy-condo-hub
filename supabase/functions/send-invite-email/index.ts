@@ -31,7 +31,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Buscar o convite para vincular com o unit_id quando o usuário se cadastrar
     const { data: invite } = await supabase
       .from('invite_tokens')
       .select('*')

@@ -67,7 +67,7 @@ export default function InviteResident() {
             unit_label: selectedUnit?.unit_label || 'sua unidade'
           }
         });
-        toast.success('Convite enviado por email! inviteResident');
+        toast.success('Convite enviado por email!');
       } catch (emailError) {
         console.error('Error sending email:', emailError);
         toast.success('Convite criado! Token: ' + token);
