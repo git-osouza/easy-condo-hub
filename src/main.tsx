@@ -4,12 +4,10 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// Register service worker for PWA. Use the Vite base URL so the path
-// works when the app is deployed under a subpath (for example /easy-portaria/).
+// Register service worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const swPath = `${import.meta.env.BASE_URL}sw.js`;
-    navigator.serviceWorker.register(swPath)
+    navigator.serviceWorker.register('/sw.js')
       .then(registration => {
         console.log('SW registered:', registration);
       })

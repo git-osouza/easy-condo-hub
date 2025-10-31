@@ -144,7 +144,7 @@ export default function RegisterDeliveryDialog({ open, onOpenChange, onSuccess }
       if (open) fetchUnits();
       onOpenChange(open);
     }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Registrar Nova Entrega</DialogTitle>
           <DialogDescription>
@@ -170,25 +170,12 @@ export default function RegisterDeliveryDialog({ open, onOpenChange, onSuccess }
 
           <div className="space-y-2">
             <Label htmlFor="obs">Observação</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {['1 objeto', '2 objetos', '3 objetos', '4 objetos', '5 objetos', 'Caixa grande', 'Envelope'].map((opt) => (
-                <Button
-                  key={opt}
-                  type="button"
-                  variant={formData.obs === opt ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFormData({ ...formData, obs: opt })}
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
             <Textarea
               id="obs"
-              placeholder="Ou digite uma observação personalizada..."
+              placeholder="Detalhes adicionais sobre a entrega..."
               value={formData.obs}
               onChange={(e) => setFormData({ ...formData, obs: e.target.value })}
-              rows={2}
+              rows={3}
             />
           </div>
 
