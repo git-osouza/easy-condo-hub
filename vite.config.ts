@@ -5,7 +5,9 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => ({
-  base: '/',
+  // Allow overriding the base path at build time by setting VITE_BASE_PATH
+  // Example: VITE_BASE_PATH=/easy-portaria/ pnpm build
+  base: process.env.VITE_BASE_PATH || '/',
   server: { host: "::", port: 8080 },
   plugins: [
     react(),
