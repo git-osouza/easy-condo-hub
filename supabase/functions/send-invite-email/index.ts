@@ -8,7 +8,6 @@ const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 interface InviteEmailRequest {
   email: string;
-  token: string;
   unit_label: string;
   unit_id: string;
 }
@@ -19,7 +18,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, token, unit_label, unit_id }: InviteEmailRequest = await req.json();
+    const { email, unit_label, unit_id }: InviteEmailRequest = await req.json();
 
     if (!RESEND_API_KEY) {
       console.error("RESEND_API_KEY não configurada");
@@ -30,21 +29,25 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    const { data: invite } = await supabase
-      .from('invite_tokens')
-      .select('*')
-      .eq('token', token)
-      .single();
 
-    if (invite) {
-      console.log(`Convite encontrado para ${email}, unit_id: ${unit_id}`);
+    // 🟢 Cria convite real no Supabase Auth
+    const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: "https://easy-condo-hub.lovable.app/",
+    });
+
+    if (error) {
+      console.error("Erro ao criar convite Supabase:", error);
+      throw new Error("Falha ao criar convite Supabase");
     }
 
-    const baseUrl = Deno.env.get("VITE_SUPABASE_URL") || supabaseUrl;
-    const redirectUrl = `${baseUrl.replace('/rest/v1', '')}/`;
-    const inviteUrl = `${baseUrl.replace('/rest/v1', '')}/auth/v1/verify?token=${token}&type=signup&redirect_to=${encodeURIComponent(redirectUrl)}`;
+    const inviteUrl = data?.action_link;
+    if (!inviteUrl) {
+      throw new Error("Link de convite não retornado pelo Supabase");
+    }
 
+    console.log(`Convite gerado para ${email}, unidade: ${unit_label}`);
+
+    // 🟢 Envio de e-mail via Resend
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -112,18 +115,19 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!res.ok) {
-      const error = await res.text();
-      console.error("Erro ao enviar email:", error);
+      const errorText = await res.text();
+      console.error("Erro ao enviar email:", errorText);
       throw new Error("Falha ao enviar email");
     }
 
-    const data = await res.json();
-    console.log("Email enviado com sucesso:", data);
+    const emailResponse = await res.json();
+    console.log("Email enviado com sucesso:", emailResponse);
 
     return new Response(
-      JSON.stringify({ success: true, data }),
+      JSON.stringify({ success: true, data: emailResponse }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
+
   } catch (error: any) {
     console.error("Error:", error);
     return new Response(
