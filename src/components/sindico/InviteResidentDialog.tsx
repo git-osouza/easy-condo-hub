@@ -67,7 +67,7 @@ export default function InviteResidentDialog({ open, onOpenChange }: InviteResid
             unit_label: selectedUnit?.unit_label || 'sua unidade'
           }
         });
-        toast.success('Convite enviado por email!');
+        toast.success('Convite enviado por email! inviteResidentDialog');
       } catch (emailError) {
         console.error('Error sending email:', emailError);
         toast.success('Convite criado! Token: ' + token);
